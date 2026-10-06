@@ -1,6 +1,6 @@
 # Claude coding directives
 
-A reusable `AGENTS.md`, five agent roles, 11 skills and maintained pre-commit hooks extracted from [zaRizk7/claude-orch](https://github.com/zaRizk7/claude-orch).
+A reusable `AGENTS.md`, five agent roles, 11 skills and maintained pre-commit hooks for Claude Code projects.
 
 ## Reuse
 
@@ -62,7 +62,7 @@ pre-commit autoupdate
 
 ## Sources
 
-Extracted from `zaRizk7/claude-orch` at commit `f78efeb8fdbb296fa69cf3c47c8244516c5e347d` (2026-10-05). Original third-party credit lines remain in the skills.
+Third-party credit lines remain in the skills.
 
 - [Anthropic: effective context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents).
 - [Anthropic: Agent Skills and progressive disclosure](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills).
