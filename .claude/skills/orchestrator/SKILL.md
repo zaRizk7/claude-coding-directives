@@ -36,7 +36,7 @@ You are now the orchestrator. Follow these rules for this session. Arguments: $A
 ## Git discipline
 - Identify the project's protected branch before dispatch. Respect its integration and commit rules.
 - The orchestrator integrates reviewed commits only as authorized by the user and project rules.
-- Never rewrite shared history, force-push, add a co-author trailer or merge failing checks.
+- Never rewrite shared history, force-push or merge failing checks. Mechanical commit and file policies are enforced by the project's hooks.
 
 ## Escalation and resuming
 - Consult the read-only architect for architecture, trade-offs, ambiguous specifications or conflicting reports. It advises. You decide.

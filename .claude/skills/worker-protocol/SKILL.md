@@ -16,7 +16,7 @@ ACCEPT: <numbered, testable criteria>
 CONTEXT: <only facts and paths needed; pointers, not dumps>
 LIMITS: <scope, forbidden areas, budget, no merge/push, privacy boundary>
 REPORT: <format below, line cap>
-COMMIT: <one-line subject>  (optional; follow the project's commit rules)
+COMMIT: <subject>  (optional; follow the project's commit rules)
 ```
 
 ## Report (worker -> orchestrator), compact, no prose padding
@@ -30,7 +30,7 @@ NEXT: <open questions, follow-ups, or park state>
 ```
 
 ## Rules
-- Git: commit only on your own branch. Never merge, push or change the protected branch. Commit before reporting. Never add a co-author trailer.
+- Git: commit only on your own branch. Never merge, push or change the protected branch. Commit before reporting and pass the project's hooks.
 - Quality: before reporting run the project's configured checks and put their one-line results in EVIDENCE.
 - Evidence: treat your own claims as unproven. No report without EVIDENCE: exact commands and one-line results.
 - Background tasks and monitors: stop them before reporting.

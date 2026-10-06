@@ -5,7 +5,7 @@
 - Read the relevant code, callers and tests before editing. Fix causes and reuse existing patterns or standard libraries before adding dependencies.
 - Keep changes simple. Avoid unrelated refactors, speculative features and temporary artifacts.
 - Run the project's relevant checks. Report exact commands, concise results and remaining risks. Never weaken a check to claim completion.
-- Make atomic Conventional Commits with one-line subjects of at most 72 characters unless the project specifies otherwise. Never add a co-author trailer.
+- Keep commits atomic. Mechanical commit and file policies belong in `.pre-commit-config.yaml`. Install its hooks and resolve failures without bypassing them.
 - Read only the project, relevant development configuration, required tool metadata and public docs. Do not access unrelated personal files, secrets, credentials, histories or other repositories.
 
 ## Context on demand
