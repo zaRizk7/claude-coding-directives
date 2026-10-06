@@ -1,0 +1,26 @@
+#!/bin/sh
+# usage: <hook-name> [git hook args...]; run by git through a symlink named after the hook, never by hand.
+# Plugin git hooks (core.hooksPath, set only for workers by hooks/guard.mjs). Every hook name symlinks here.
+# reference-transaction: workers (ORCH_WORKER=1) may not move refs/heads/$ORCH_PROTECT (required). All hooks then chain to the project's own
+# hook of the same name in $ORCH_HOOKS_ORIG (the hooks dir that was in effect before).
+# commit-msg: workers' messages must pass the plugin's own Conventional Commit check, so it holds in any project, not only where .githooks is enabled.
+name=${0##*/}
+orig=${ORCH_HOOKS_ORIG:-}
+if [ "$name" = reference-transaction ]; then
+  in=$(cat)
+  if [ "${ORCH_WORKER:-}" = 1 ] && [ "$1" = prepared ] && [ -z "${ORCH_PROTECT:-}" ]; then
+    echo 'coding-directives: protected branch is unset; refusing to run unguarded.' >&2
+    exit 1
+  fi
+  if [ "${ORCH_WORKER:-}" = 1 ] && [ "$1" = prepared ] && printf '%s\n' "$in" | awk '$3=="refs/heads/" ENVIRON["ORCH_PROTECT"]{f=1}END{exit !f}'; then
+    echo "coding-directives: workers must not move refs/heads/$ORCH_PROTECT." >&2
+    exit 1
+  fi
+  if [ -x "$orig/$name" ]; then printf '%s\n' "$in" | "$orig/$name" "$@"; exit $?; fi
+  exit 0
+fi
+if [ "$name" = commit-msg ] && [ "${ORCH_WORKER:-}" = 1 ]; then
+  "${ORCH_PLUGIN_ROOT:?}/githooks/commit-msg" "$@" || exit 1
+fi
+[ -x "$orig/$name" ] && exec "$orig/$name" "$@"
+exit 0

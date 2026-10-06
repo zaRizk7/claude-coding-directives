@@ -1,0 +1,13 @@
+#!/bin/sh
+# usage: commit-msg <message-file>; enable with git config core.hooksPath githooks.
+# Defaults match the directives. Projects may override through git config.
+max=$(git config --get coding.commitMaxLength || printf '%s' 72)
+types=$(git config --get coding.commitTypes || printf '%s' 'feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|merge')
+case "$max" in ''|*[!0-9]*) echo 'commit-msg: invalid coding.commitMaxLength' >&2; exit 1;; esac
+[ "$max" -gt 0 ] || { echo 'commit-msg: coding.commitMaxLength must be positive' >&2; exit 1; }
+printf '%s' "$types" | grep -Eq '^[a-z]+(\|[a-z]+)*$' || { echo 'commit-msg: invalid coding.commitTypes' >&2; exit 1; }
+msg=$(grep -v '^#' "$1" | sed '/^[[:space:]]*$/d')
+[ "$(printf '%s\n' "$msg" | wc -l | tr -d ' ')" = 1 ] || { echo "commit-msg: must be a single line" >&2; exit 1; }
+[ "${#msg}" -le "$max" ] || { echo "commit-msg: >$max chars" >&2; exit 1; }
+printf '%s' "$msg" | grep -Eq "^($types)(\([a-z0-9._/-]+\))?!?: .+" \
+  || { echo "commit-msg: not a Conventional Commit (type(scope): subject)" >&2; exit 1; }
