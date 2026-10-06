@@ -1,4 +1,4 @@
-# Agent coding directives
+# Claude coding directives
 
 A reusable `AGENTS.md`, five agent roles, 11 skills and maintained pre-commit hooks extracted from [zaRizk7/claude-orch](https://github.com/zaRizk7/claude-orch).
 
