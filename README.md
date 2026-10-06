@@ -1,4 +1,4 @@
-# Coding directives
+# Agent coding directives
 
 A reusable `AGENTS.md`, five agent roles, 11 skills and maintained pre-commit hooks extracted from [zaRizk7/claude-orch](https://github.com/zaRizk7/claude-orch).
 
@@ -14,7 +14,7 @@ AGENTS.md
 .pre-commit-config.yaml
 ```
 
-Claude Code discovers the roles and skills in these native directories. Invoke `/orchestrator` when you want explicit orchestration. Claude may reorganize the resources for a project's needs while keeping references and names consistent.
+Claude Code discovers the roles and skills in these native directories. Invoke `/orchestrator` when you want explicit orchestration. Claude may reorganize or rename the resources to fit a project while preserving directives and hook enforcement and updating references.
 
 For another agent, use `AGENTS.md` as the entry point and the role files as delegated prompts. If it requires a different skill discovery location, move the relevant skill directories there and update the entry-point paths.
 
