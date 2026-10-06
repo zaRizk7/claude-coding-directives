@@ -1,5 +1,7 @@
 ---
 name: architect
+model: opus
+effort: xhigh
 description: Non-coding staff consult for architecture, trade-offs and deadlocks. Read-only.
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
 skills: [worker-protocol]

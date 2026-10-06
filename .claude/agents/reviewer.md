@@ -1,5 +1,7 @@
 ---
 name: reviewer
+model: opus
+effort: medium
 description: Fresh-context read-only reviewer; challenges a diff against ACCEPT, tests and evidence.
 tools: Read, Grep, Glob, Bash, Monitor, TaskStop, WebFetch, WebSearch
 skills: [worker-protocol, challenge-claims, code-quality]

@@ -1,5 +1,7 @@
 ---
 name: tester
+model: opus
+effort: medium
 description: Writes and runs tests against ACCEPT criteria; pairs with the implementer in the dev-test loop.
 tools: Read, Grep, Glob, Edit, Write, Bash, SendMessage, Monitor, TaskStop
 skills: [worker-protocol, test-first, challenge-claims, code-quality]
