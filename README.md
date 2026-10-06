@@ -1,6 +1,6 @@
 # Coding directives
 
-Coding directives, 11 skills, five agent roles and native Git hooks extracted from [zaRizk7/claude-orch](https://github.com/zaRizk7/claude-orch).
+Coding directives, 11 skills, five agent roles and a reusable pre-commit configuration extracted from [zaRizk7/claude-orch](https://github.com/zaRizk7/claude-orch).
 
 ## Reuse
 
@@ -8,73 +8,43 @@ Merge `CLAUDE.md` into your project's existing instructions. `AGENTS.md` points 
 
 Copy selected `skills/<name>/` directories into `.claude/skills/` for Claude Code or `.agents/skills/` for Codex. Copy `agents/*.md` into `.claude/agents/` for Claude Code, or use them as role prompts in another agent's briefs.
 
-## Native Git hooks
+## Hooks
 
-Install the hooks in Git's default `.git/hooks` directory. From the target project, resolve its hooks directory and copy the scripts there:
-
-```sh
-hook_dir=$(git rev-parse --git-path hooks)
-mkdir -p "$hook_dir"
-cp -n /path/to/coding-directives/githooks/* "$hook_dir/"
-chmod +x "$hook_dir/commit-msg" "$hook_dir/reference-transaction" "$hook_dir/pre-push"
-```
-
-`cp -n` preserves existing files. If a hook already exists, merge the relevant check into it. No `core.hooksPath` setting is needed. If the target project already overrides that setting, Git resolves its existing hooks directory instead.
-
-`githooks/` holds the versioned source files for migration. `.git/hooks` holds the installed copies and is not committed or transferred by cloning. Git's default hooks directory is shared by linked worktrees, so these scripts are installed once per repository.
-
-| Hook | Behavior |
-| --- | --- |
-| `commit-msg` | One-line Conventional Commits, at most 72 characters by default |
-| `reference-transaction` | Prevent workers from moving or deleting the protected local branch |
-| `pre-push` | Prevent workers from pushing |
-
-Git and a POSIX shell are the only hook requirements. The commit hook applies to everyone. Branch and push guards apply only to worktrees marked as workers.
-
-Enable Git's native per-worktree configuration once in the primary checkout:
+Copy `.pre-commit-config.yaml` into the target project, or merge its entries into an existing configuration. Install the `pre-commit` package if needed, then run:
 
 ```sh
-git config extensions.worktreeConfig true
+pre-commit install --install-hooks
+pre-commit run --all-files
 ```
 
-Then mark each worker from inside its worktree:
+The configuration installs both `pre-commit` and `commit-msg` hooks through pre-commit's native Git integration. It pins maintained upstream hooks for:
 
-```sh
-git config --worktree coding.worker true
-```
+- YAML and JSON syntax.
+- Merge conflict markers.
+- Trailing whitespace and final newlines.
+- Conventional Commit message formatting.
 
-Do not set `coding.worker` in shared repository config, which would mark the coordinator too.
+The one-line, 72-character commit convention remains in the coding directives. Worker branch and push restrictions also remain agent directives. Enforce repository access and branch protection through the target project's Git hosting settings.
 
-Optional project settings:
-
-```sh
-git config coding.protectedBranch release
-git config coding.commitMaxLength 72
-git config coding.commitTypes 'feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|merge'
-```
-
-Without an override, branch protection uses origin/HEAD, then an existing main/master branch, then the primary checkout branch, then init.defaultBranch, then main. Coordinator operations remain available. These local hooks do not replace repository permissions or server-side branch protection.
+No custom hook scripts, plugin metadata, application runtime, project goals, quota tracking, harness adapters, cloud bootstrap or source-project configuration.
 
 ## Contents
 
 - `CLAUDE.md`, `AGENTS.md`: coding, scope, evidence, commit and privacy directives.
 - `skills/`: orchestrator, worker-protocol, code-quality, test-first, challenge-claims, diagnose-bugs, simplify-safely, visual-inspect, interview, goal-spec, task-breakdown.
 - `agents/`: implementer, tester, reviewer, investigator, architect.
-- `githooks/`: versioned hook source files to copy into the target repository's `.git/hooks`.
-- `test/`: checks in temporary foreign Git repositories.
+- `.pre-commit-config.yaml`: maintained file and commit-message hooks.
 
-No plugin metadata, Claude event hooks, application runtime, project goals, quota tracking, harness adapters, cloud bootstrap or source-project configuration.
-
-## Verify
+## Verify and update
 
 ```sh
-node --test test/hooks.test.mjs
+pre-commit validate-config
+pre-commit run --all-files
+pre-commit autoupdate
 ```
 
-Node is used only for these development tests. The hooks themselves use shell and Git.
+## Sources
 
-## Source
+Extracted from `zaRizk7/claude-orch` at commit `f78efeb8fdbb296fa69cf3c47c8244516c5e347d` (2026-10-05). Original third-party credit lines remain in the skills.
 
-Extracted from `zaRizk7/claude-orch` at commit `f78efeb8fdbb296fa69cf3c47c8244516c5e347d` (2026-10-05). Original third-party credit lines remain in the skills. Git guards were adapted to use native worktree-local configuration.
-
-Native hook behavior: [Git hooks documentation](https://git-scm.com/docs/githooks).
+Hook setup follows [pre-commit](https://pre-commit.com/), [pre-commit-hooks](https://github.com/pre-commit/pre-commit-hooks/tree/v6.0.0) and [conventional-pre-commit](https://github.com/compilerla/conventional-pre-commit/tree/v4.4.0).

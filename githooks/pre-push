@@ -1,9 +1,0 @@
-#!/bin/sh
-# Workers commit locally. Integration and publication belong to the coordinator.
-worker=$(git config --bool --get coding.worker)
-status=$?
-case "$status:$worker" in
-  1:|0:false) exit 0 ;;
-  0:true) echo 'pre-push: workers must not push' >&2; exit 1 ;;
-  *) echo 'pre-push: invalid coding.worker configuration' >&2; exit 1 ;;
-esac
