@@ -4,6 +4,31 @@ A reusable `AGENTS.md`, five agent roles, 11 skills and maintained pre-commit ho
 
 ## Reuse
 
+For deterministic setup, clone this repository and run its shell command from a terminal:
+
+```sh
+git clone https://github.com/zaRizk7/claude-coding-directives.git
+./claude-coding-directives/setup-repo-coding-directives /path/to/project
+```
+
+Setup requires Git and the `pre-commit` package. It installs the shared instructions as `.claude/AGENTS.md`, copies the roles, skills and hook configuration, installs all configured Git stages and checks the installed files. Existing root instructions and unrelated Claude files stay intact. Identical installed files allow reruns. Different destination files or symlinked destinations stop setup before any copies. Conflicting configurations need manual integration. Installation or check failures return a nonzero status and leave the copied files available for inspection.
+
+To run the same command inside Claude Code without a model response, launch Claude with:
+
+```sh
+claude --settings '{"respondToBashCommands":false,"promptSuggestionEnabled":false}'
+```
+
+Then use shell mode:
+
+```text
+! /path/to/claude-coding-directives/setup-repo-coding-directives .
+```
+
+A custom `/setup-repo-coding-directives` skill would load a model prompt. The shell command makes no model calls. Claude's shell mode still stores the command and output in conversation context, which can count toward later requests. Use the terminal command for no token impact. Restart Claude after setup and inspect `/memory` to confirm `.claude/AGENTS.md` loaded. If a project's `CLAUDE.md` suppresses AGENTS.md loading, select `claude-md-and-agents-md` under `/config` → Project instructions.
+
+For manual adoption:
+
 Merge `AGENTS.md` into the target project's instructions and copy `.claude/` as one folder. If that folder already exists, merge the selected roles and skills instead of overwriting its files.
 
 ```text
@@ -58,6 +83,7 @@ pre-commit run --all-files
 pre-commit run --hook-stage pre-merge-commit --all-files
 pre-commit run --hook-stage pre-push --all-files
 pre-commit autoupdate
+./tests/setup-repo-coding-directives.sh
 ```
 
 ## Sources
@@ -67,4 +93,5 @@ Extracted from `zaRizk7/claude-orch` at commit `f78efeb8fdbb296fa69cf3c47c824451
 - [Anthropic: effective context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents).
 - [Anthropic: Agent Skills and progressive disclosure](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills).
 - [Claude Code: AGENTS.md loading](https://code.claude.com/docs/en/memory#agentsmd), [skills](https://code.claude.com/docs/en/skills), [subagents](https://code.claude.com/docs/en/sub-agents).
+- [Claude Code: shell mode and model responses](https://code.claude.com/docs/en/interactive-mode#shell-mode-with--prefix).
 - [pre-commit hook stages](https://pre-commit.com/#supported-git-hooks), [pre-commit-hooks](https://github.com/pre-commit/pre-commit-hooks/tree/v6.0.0) and [gitlint rules](https://jorisroovers.com/gitlint/latest/rules/builtin_rules/).

@@ -1,0 +1,66 @@
+#!/bin/sh
+# Install this bundle into a Git project without overwriting different files.
+# Usage: setup-repo-coding-directives [project-directory]
+set -eu
+
+if [ "${1:-}" = "--help" ]; then
+    printf '%s\n' 'Usage: setup-repo-coding-directives [project-directory]'
+    exit 0
+fi
+if [ "$#" -gt 1 ]; then
+    printf '%s\n' 'Expected at most one project directory.' >&2
+    exit 1
+fi
+
+bundle_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+project_dir=$(git -C "${1:-.}" rev-parse --show-toplevel)
+project_dir=$(CDPATH= cd -- "$project_dir" && pwd -P)
+command -v pre-commit >/dev/null 2>&1 || {
+    printf '%s\n' 'Install the pre-commit package before running setup.' >&2
+    exit 1
+}
+if [ -n "$(git -C "$project_dir" config --get core.hooksPath || :)" ]; then
+    printf '%s\n' 'core.hooksPath is set. Resolve it before installing pre-commit hooks.' >&2
+    exit 1
+fi
+pre-commit validate-config "$bundle_dir/.pre-commit-config.yaml"
+
+# Check every destination before copying any file. Keep project instructions intact.
+set --
+for phase in check copy; do
+    for source_file in "$bundle_dir/AGENTS.md" "$bundle_dir/.pre-commit-config.yaml" \
+        "$bundle_dir"/.claude/agents/*.md "$bundle_dir"/.claude/skills/*/SKILL.md; do
+        relative=${source_file#"$bundle_dir"/}
+        if [ "$relative" = AGENTS.md ]; then
+            relative=.claude/AGENTS.md
+        fi
+        destination=$project_dir/$relative
+        if [ "$phase" = check ]; then
+            parent=$(dirname -- "$relative")
+            while [ "$parent" != . ]; do
+                directory=$project_dir/$parent
+                if [ -L "$directory" ] || { [ -e "$directory" ] && [ ! -d "$directory" ]; }; then
+                    printf 'Unsafe destination directory: %s\n' "$directory" >&2
+                    exit 1
+                fi
+                parent=$(dirname -- "$parent")
+            done
+            if [ -L "$destination" ] || { [ -e "$destination" ] && \
+                { [ ! -f "$destination" ] || ! cmp -s "$source_file" "$destination"; }; }; then
+                printf 'Conflicting file: %s. Integrate it manually before setup.\n' "$destination" >&2
+                exit 1
+            fi
+        else
+            if [ ! -e "$destination" ]; then
+                mkdir -p -- "$(dirname -- "$destination")"
+                cp -- "$source_file" "$destination"
+            fi
+            set -- "$@" "$relative"
+        fi
+    done
+done
+
+cd -- "$project_dir"
+pre-commit install --install-hooks
+pre-commit run --files "$@"
+printf '%s\n' 'Coding directives and Git hooks installed. Restart Claude Code to load them.'
