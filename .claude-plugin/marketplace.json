@@ -1,6 +1,0 @@
-{
-  "name": "coding-directives",
-  "description": "Reusable coding directives, skills, roles and hooks.",
-  "owner": { "name": "zaRizk7" },
-  "plugins": [{ "name": "coding-directives", "description": "Reusable coding workflow", "source": "./" }]
-}
