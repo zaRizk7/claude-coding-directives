@@ -10,13 +10,18 @@ Copy selected `skills/<name>/` directories into `.claude/skills/` for Claude Cod
 
 ## Native Git hooks
 
-Copy `githooks/` into a project without an existing hooks setup, then enable it:
+Install the hooks in Git's default `.git/hooks` directory. From the target project, resolve its hooks directory and copy the scripts there:
 
 ```sh
-git config core.hooksPath githooks
+hook_dir=$(git rev-parse --git-path hooks)
+mkdir -p "$hook_dir"
+cp -n /path/to/coding-directives/githooks/* "$hook_dir/"
+chmod +x "$hook_dir/commit-msg" "$hook_dir/reference-transaction" "$hook_dir/pre-push"
 ```
 
-If the project already has hooks, merge these checks into its existing hooks instead of replacing `core.hooksPath`.
+`cp -n` preserves existing files. If a hook already exists, merge the relevant check into it. No `core.hooksPath` setting is needed. If the target project already overrides that setting, Git resolves its existing hooks directory instead.
+
+`githooks/` holds the versioned source files for migration. `.git/hooks` holds the installed copies and is not committed or transferred by cloning. Git's default hooks directory is shared by linked worktrees, so these scripts are installed once per repository.
 
 | Hook | Behavior |
 | --- | --- |
@@ -38,7 +43,7 @@ Then mark each worker from inside its worktree:
 git config --worktree coding.worker true
 ```
 
-Do not set `coding.worker` in shared repository config, which would mark the coordinator too. When copying hooks, also copy them into each worker worktree, or configure an absolute `core.hooksPath` to the project's hook directory before creating workers.
+Do not set `coding.worker` in shared repository config, which would mark the coordinator too.
 
 Optional project settings:
 
@@ -55,7 +60,7 @@ Without an override, branch protection uses origin/HEAD, then an existing main/m
 - `CLAUDE.md`, `AGENTS.md`: coding, scope, evidence, commit and privacy directives.
 - `skills/`: orchestrator, worker-protocol, code-quality, test-first, challenge-claims, diagnose-bugs, simplify-safely, visual-inspect, interview, goal-spec, task-breakdown.
 - `agents/`: implementer, tester, reviewer, investigator, architect.
-- `githooks/`: native Git hooks.
+- `githooks/`: versioned hook source files to copy into the target repository's `.git/hooks`.
 - `test/`: checks in temporary foreign Git repositories.
 
 No plugin metadata, Claude event hooks, application runtime, project goals, quota tracking, harness adapters, cloud bootstrap or source-project configuration.
@@ -71,3 +76,5 @@ Node is used only for these development tests. The hooks themselves use shell an
 ## Source
 
 Extracted from `zaRizk7/claude-orch` at commit `f78efeb8fdbb296fa69cf3c47c8244516c5e347d` (2026-10-05). Original third-party credit lines remain in the skills. Git guards were adapted to use native worktree-local configuration.
+
+Native hook behavior: [Git hooks documentation](https://git-scm.com/docs/githooks).

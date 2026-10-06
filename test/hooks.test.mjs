@@ -1,7 +1,7 @@
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, copyFileSync, existsSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,7 +15,12 @@ const ok = (cwd, ...args) => { const result = run(cwd, ...args); assert.equal(re
 function fixture(branch = 'main') {
   const cwd = mkdtempSync(join(scratch, 'project-'));
   ok(cwd, 'init', '-b', branch);
-  ok(cwd, 'config', 'core.hooksPath', join(root, 'githooks'));
+  const hooks = ok(cwd, 'rev-parse', '--path-format=absolute', '--git-path', 'hooks');
+  for (const name of readdirSync(join(root, 'githooks'))) {
+    const target = join(hooks, name);
+    copyFileSync(join(root, 'githooks', name), target);
+    chmodSync(target, 0o755);
+  }
   ok(cwd, 'commit', '--allow-empty', '-m', 'chore: initial');
   ok(cwd, 'config', 'extensions.worktreeConfig', 'true');
   const worker = join(cwd, 'trees', 'worker');
@@ -23,6 +28,14 @@ function fixture(branch = 'main') {
   ok(worker, 'config', '--worktree', 'coding.worker', 'true');
   return { cwd, worker };
 }
+
+test('hooks use the default .git/hooks directory shared by linked worktrees', () => {
+  const { cwd, worker } = fixture();
+  assert.notEqual(run(cwd, 'config', '--get', 'core.hooksPath').status, 0);
+  const hooks = ok(cwd, 'rev-parse', '--path-format=absolute', '--git-path', 'hooks');
+  assert.equal(hooks, join(cwd, '.git', 'hooks'));
+  assert.equal(ok(worker, 'rev-parse', '--path-format=absolute', '--git-path', 'hooks'), hooks);
+});
 
 test('native commit-msg hook accepts conventional commits and rejects bodies, trailers and long subjects', () => {
   const { cwd } = fixture();
