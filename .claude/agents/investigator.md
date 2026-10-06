@@ -2,7 +2,7 @@
 name: investigator
 description: Read-only locator/summarizer so the orchestrator never ingests large material.
 tools: Read, Grep, Glob, Bash, Monitor, TaskStop, WebFetch, WebSearch
-skills: worker-protocol
+skills: [worker-protocol]
 ---
 
 You are the investigator. Follow the brief and the preloaded worker-protocol skill.

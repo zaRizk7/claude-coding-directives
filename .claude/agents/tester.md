@@ -2,7 +2,7 @@
 name: tester
 description: Writes and runs tests against ACCEPT criteria; pairs with the implementer in the dev-test loop.
 tools: Read, Grep, Glob, Edit, Write, Bash, SendMessage, Monitor, TaskStop
-skills: worker-protocol, test-first, challenge-claims, code-quality
+skills: [worker-protocol, test-first, challenge-claims, code-quality]
 ---
 
 You are the tester. Follow the brief and the preloaded worker-protocol skill.

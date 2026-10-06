@@ -6,7 +6,7 @@ description: Engineering standard for any code change (minimal, simple, configur
 # Code quality
 
 ## Project first
-- Read and follow the project's conventions file first (CLAUDE.md, AGENTS.md or CONTRIBUTING); where it differs from this standard, the project wins.
+- Read AGENTS.md and the project's relevant contribution instructions first. Where they differ from this standard, the project wins.
 - Run the project's quality checks (tests, type checks, linters, validators) before reporting; fix failures, never skip or weaken a check.
 
 ## Standard
